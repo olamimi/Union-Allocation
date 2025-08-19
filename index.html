@@ -248,33 +248,68 @@
             // Create video element
             const video = document.createElement('video');
             video.controls = true;
-            video.autoplay = true;
             video.muted = true;
             video.style.width = '100%';
             video.style.maxWidth = '600px';
             video.style.borderRadius = '8px';
             video.style.backgroundColor = '#000';
+            video.preload = 'metadata';
             
-            // Use your local video file
-            video.src = './Why are you Gay - Funniest African interview ever! Link to full interview below.mp4';
-            video.type = 'video/mp4';
+            // Create source element for better browser compatibility
+            const source = document.createElement('source');
+            source.src = encodeURI('./Why are you Gay - Funniest African interview ever! Link to full interview below.mp4');
+            source.type = 'video/mp4';
+            video.appendChild(source);
+            
+            // Add fallback text
+            video.innerHTML += 'Your browser does not support the video tag.';
+            
+            // Event listeners
+            video.addEventListener('loadstart', function() {
+                console.log('Video loading started');
+            });
+            
+            video.addEventListener('loadedmetadata', function() {
+                console.log('Video metadata loaded');
+            });
             
             video.addEventListener('loadeddata', function() {
-                console.log('Video loaded successfully');
+                console.log('Video data loaded successfully');
+                // Try to play with sound first
                 video.muted = false;
                 video.play().catch((error) => {
                     console.log('Autoplay with sound failed, trying muted:', error);
                     video.muted = true;
                     video.play().catch((err) => {
                         console.error('All autoplay attempts failed:', err);
-                        showError('Click the video to start playback');
+                        showPlayButton();
                     });
                 });
             });
             
             video.addEventListener('error', function(e) {
                 console.error('Video loading error:', e);
-                showError('Error loading video file. Please check if the file exists.');
+                const error = video.error;
+                let errorMessage = 'Error loading video file.';
+                
+                if (error) {
+                    switch(error.code) {
+                        case error.MEDIA_ERR_ABORTED:
+                            errorMessage = 'Video loading was aborted.';
+                            break;
+                        case error.MEDIA_ERR_NETWORK:
+                            errorMessage = 'Network error while loading video.';
+                            break;
+                        case error.MEDIA_ERR_DECODE:
+                            errorMessage = 'Video file is corrupted or unsupported format.';
+                            break;
+                        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                            errorMessage = 'Video file not found or unsupported format.';
+                            break;
+                    }
+                }
+                
+                showError(errorMessage + ' Make sure the video file is in the same folder as index.html.');
             });
             
             video.addEventListener('play', function() {
@@ -285,24 +320,45 @@
             video.addEventListener('click', function() {
                 if (video.muted) {
                     video.muted = false;
-                    const unmuteMsg = document.createElement('p');
-                    unmuteMsg.textContent = 'Audio enabled!';
-                    unmuteMsg.style.color = '#4CAF50';
-                    unmuteMsg.style.fontSize = '14px';
-                    unmuteMsg.style.marginTop = '10px';
-                    videoContainer.appendChild(unmuteMsg);
-                    setTimeout(() => unmuteMsg.remove(), 2000);
+                    showMessage('Audio enabled!', '#4CAF50');
                 }
             });
             
+            // Function to show play button if autoplay fails
+            function showPlayButton() {
+                const playBtn = document.createElement('button');
+                playBtn.textContent = '▶ Play Video';
+                playBtn.style.cssText = `
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    font-size: 16px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin: 10px;
+                `;
+                playBtn.onclick = function() {
+                    video.play();
+                    playBtn.remove();
+                };
+                videoContainer.appendChild(playBtn);
+            }
+            
+            // Function to show messages
+            function showMessage(text, color) {
+                const msg = document.createElement('p');
+                msg.textContent = text;
+                msg.style.color = color;
+                msg.style.fontSize = '14px';
+                msg.style.marginTop = '10px';
+                videoContainer.appendChild(msg);
+                setTimeout(() => msg.remove(), 3000);
+            }
+            
             // Function to show error messages
             function showError(errorText) {
-                const errorMsg = document.createElement('p');
-                errorMsg.textContent = errorText;
-                errorMsg.style.color = '#ff4444';
-                errorMsg.style.marginTop = '10px';
-                errorMsg.style.fontSize = '14px';
-                videoContainer.appendChild(errorMsg);
+                showMessage(errorText, '#ff4444');
             }
             
             // Append video to container
