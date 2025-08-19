@@ -255,11 +255,10 @@
             video.style.borderRadius = '8px';
             video.style.backgroundColor = '#000';
             
-            // Set video source
-            video.src = encodeURI('./Why are you Gay - Funniest African interview ever! Link to full interview below.mp4');
+            // Use your local video file
+            video.src = './Why are you Gay - Funniest African interview ever! Link to full interview below.mp4';
             video.type = 'video/mp4';
             
-            // Handle video events
             video.addEventListener('loadeddata', function() {
                 console.log('Video loaded successfully');
                 video.muted = false;
