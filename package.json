@@ -1,0 +1,26 @@
+{
+  "name": "union-allocation-checker",
+  "version": "1.0.0",
+  "description": "A web-based application to check Union allocations with interactive video playback functionality",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "union",
+    "allocation",
+    "checker",
+    "web-app",
+    "javascript",
+    "html5",
+    "css3"
+  ],
+  "author": "Capt. Awesome",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olamimi/Union-Allocation.git"
+  },
+  "homepage": "https://github.com/olamimi/Union-Allocation#readme"
+}
